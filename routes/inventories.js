@@ -1,17 +1,15 @@
 const router = require("express").Router();
-const warehousesController = require("../controllers/warehousesController");
+const inventoriesController = require("../controllers/inventoriesController");
 
-const { getWarehouses, postWarehouse } = warehousesController;
+const { postInventoryItem } = inventoriesController;
 
 require("dotenv").config(); // load variables from .env file
 const PORT = process.env.PORT || 8080; // Set server port from .env file
 const SERVER_URL = process.env.SERVER_URL;
 
 /*
- * GET home page
+ * POST Inventory Item
  */
-router.get("/", getWarehouses);
-
-router.post("/", postWarehouse);
+router.post("/", postInventoryItem);
 
 module.exports = router;
