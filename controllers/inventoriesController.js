@@ -5,6 +5,7 @@ const PORT = process.env.PORT || 8080; // Set server port from .env file
 const SERVER_URL = process.env.SERVER_URL;
 
 // POST functions
+// Add a new inventory Item
 function postInventoryItem(req, res) {
   // Check if the body has all required fields
   if (
