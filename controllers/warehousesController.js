@@ -138,6 +138,7 @@ function getWarehouseInventory(req, res) {
       });
     });
 }
+
 // Edit Warehouse
 function editWarehouse(req, res) {
   const warehouseId = req.params.id;
