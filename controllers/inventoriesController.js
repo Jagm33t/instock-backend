@@ -14,11 +14,6 @@ function getInventoryItems(req, res) {
     .catch((err) => res.status(400).send(`Error retrieving data: ${err}`));
 }
 
-// POST functions
-function postInventoryItem(req, res) {
-  res.status(200).send("POST new inventory Item");
-}
-
 function getInventoryItems(req, res) {
   knex("inventories")
     .join("warehouses", "warehouses.id", "inventories.warehouse_id")
@@ -124,9 +119,6 @@ function deleteInventoryItem(req, res) {
 
 module.exports = {
   postInventoryItem,
-<<<<<<< HEAD
   getInventoryItems,
-=======
   deleteInventoryItem,
->>>>>>> develop
 };
