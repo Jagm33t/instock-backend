@@ -80,7 +80,69 @@ function deleteInventoryItem(req, res) {
     });
 }
 
+// Edit an Inventory Item
+function editInventoryItem(req, res) {
+  const requiredFields = [
+    "warehouse_id",
+    "item_name",
+    "description",
+    "category",
+    "status",
+    "quantity",
+  ];
+
+  for (const field of requiredFields) {
+    if (!req.body[field]) {
+      return res.status(400).send(`Please provide ${field} for the inventory`);
+    }
+  }
+
+  const quantity = req.body.quantity;
+
+  if (isNaN(quantity)) {
+    return res.status(400).json({ message: "Quantity must be a number" });
+  }
+
+  const inventoryId = req.params.id;
+  const warehouseId = req.body.warehouse_id;
+  const updatedData = { ...req.body };
+  delete updatedData.id;
+
+  knex("warehouses")
+    .where({ id: warehouseId })
+    .first()
+    .then((warehouse) => {
+      if (!warehouse) {
+        return res.status(404).json({
+          message: `Warehouse with ID: ${warehouseId} not found.`,
+        });
+      }
+
+      return knex("inventories").where({ id: inventoryId }).update(updatedData);
+    })
+    .then((result) => {
+      if (result === 0) {
+        return res.status(404).json({
+          message: `Inventory with ID: ${inventoryId} not found.`,
+        });
+      }
+
+      return knex("inventories").where({ id: inventoryId }).first();
+    })
+    .then((updatedItem) => {
+      res.status(200).json(updatedItem);
+      return null;
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({
+        message: `Unable to update inventory with ID: ${inventoryId}`,
+      });
+    });
+}
+
 module.exports = {
   postInventoryItem,
   deleteInventoryItem,
+  editInventoryItem,
 };
