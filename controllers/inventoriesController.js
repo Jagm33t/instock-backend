@@ -145,44 +145,70 @@ function editInventoryItem(req, res) {
   const updatedData = { ...req.body };
   delete updatedData.id;
 
-  knex("inventories")
-    .join("warehouses", "warehouses.id", "inventories.warehouse_id")
-    .then((data) => {
-      res.status(200).json(data);
+  const queryState = {
+    foundWarehouse: false,
+    foundInventories: false,
+  };
+
+  knex("warehouses")
+    .where({ id: warehouseId })
+    .first()
+    .then((warehouse) => {
+      console.log("warehouse", warehouse);
+      if (!warehouse) {
+        queryState.foundWarehouse = false;
+        // res.status(404).json({
+        //   message: `Warehouse with ID: ${warehouseId} not found.`,
+        // });
+      } else {
+        // console.log("inventoryId", inventoryId);
+        // queryState.foundWarehouse = warehouse;
+        queryState.foundWarehouse = true;
+        return knex("inventories")
+          .where({ id: inventoryId })
+          .update(updatedData);
+      }
     })
-    .catch((err) => res.status(400).send(`Error retrieving data: ${err}`));
+    .then((rowsUpdated) => {
+      console.log("rowsUpdated", rowsUpdated);
+      // console.log("inventories", inventories);
+      if (!rowsUpdated) {
+        res.json({
+          foundWarehouse: queryState.foundWarehouse,
+          message: "inventory item not found, not updated",
+        });
+      } else {
+        return knex("inventories").where({ id: inventoryId });
+      }
 
-  // knex("warehouses")
-  //   .where({ id: warehouseId })
-  //   .first()
-  //   .then((warehouse) => {
-  //     if (!warehouse) {
-  //       return res.status(404).json({
-  //         message: `Warehouse with ID: ${warehouseId} not found.`,
-  //       });
-  //     }
+      // if (!inventories) {
+      //   queryState.foundInventories = false;
 
-  //     return knex("inventories").where({ id: inventoryId }).update(updatedData);
-  //   })
-  //   .then((result) => {
-  //     if (result === 0) {
-  //       return res.status(404).json({
-  //         message: `Inventory with ID: ${inventoryId} not found.`,
-  //       });
-  //     }
-
-  //     return knex("inventories").where({ id: inventoryId }).first();
-  //   })
-  //   .then((updatedItem) => {
-  //     res.status(200).json(updatedItem);
-  //     return null;
-  //   })
-  //   .catch((error) => {
-  //     console.error(error);
-  //     res.status(500).json({
-  //       message: `Unable to update inventory with ID: ${inventoryId}`,
-  //     });
-  //   });
+      //   // return res.status(404).json({
+      //   //   message: `Inventory with ID: ${inventoryId} not found.`,
+      //   // });
+      // } else {
+      //   console.log("inventories", inventories);
+      //   queryState.foundInventories = inventories;
+      //   return knex("inventories").where({ id: inventoryId });
+      // }
+    })
+    .then((updatedInventory) => {
+      res.json(updatedInventory);
+      // console.log(updatedItem);
+      // console.log("updatedItem", updatedItem);
+      // if (!queryState.foundInventories) {
+      //   res.json({ message: "no inventories found with that id" });
+      // } else {
+      //   return res.status(200).json(queryState.foundInventories);
+      // }
+    })
+    .catch((error) => {
+      console.error(error);
+      return res.status(500).json({
+        message: `Unable to update inventory with ID: ${inventoryId}`,
+      });
+    });
 }
 
 module.exports = {
