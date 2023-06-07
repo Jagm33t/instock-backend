@@ -1,10 +1,7 @@
 const knex = require("knex")(require("../knexfile"));
-const express = require("express");
-require("dotenv").config(); // load variables from .env file
-const PORT = process.env.PORT || 8080; // Set server port from .env file
-const SERVER_URL = process.env.SERVER_URL;
 
 // GET functions
+// Get all warehouses
 function getWarehouses(req, res) {
   knex("warehouses")
     .select(
@@ -21,9 +18,46 @@ function getWarehouses(req, res) {
     .then((data) => {
       res.status(200).json(data);
     })
-    .catch((err) =>
-      res.status(400).send(`Error retrieving Warehouses: ${err}`)
-    );
+    .catch((err) => {
+      // Console.log shows the error only on the server side
+      console.log(`getWarehouses: Error retrieving Warehouses ${err}`);
+      res.status(400).send(`Error retrieving Warehouses.`);
+    });
+}
+
+// Get a single warehouse by id
+function getSingleWarehouse(req, res) {
+  const warehouseId = req.params.id;
+  knex("warehouses")
+    .select(
+      "id",
+      "warehouse_name",
+      "address",
+      "city",
+      "country",
+      "contact_name",
+      "contact_position",
+      "contact_phone",
+      "contact_email"
+    )
+    .where({ id: warehouseId })
+    .then((result) => {
+      if (result.length === 0) {
+        return res
+          .status(404)
+          .send({ message: `Warehouse ID ${warehouseId} not found.` });
+      }
+      return res.status(200).json(result);
+    })
+    .catch((err) => {
+      // Console.log shows the error only on the server side
+      console.log(
+        `getSingleWarehouse: Error retrieving data for the Warehouse ID ${warehouseId} ${err}`
+      );
+      return res
+        .status(400)
+        .send(`Error retrieving data for the Warehouse ID ${warehouseId}`);
+    });
 }
 
 // Post A New Warehouse
@@ -64,11 +98,46 @@ function postWarehouse(req, res) {
     .then((createdWarehouse) => {
       res.status(201).json(createdWarehouse);
     })
-    .catch(() => {
+    .catch((err) => {
+      // Console.log shows the error only on the server side
+      console.log(`postWarehous: Unable to create a new warehouse ${err}`);
       res.status(500).json({ message: "Unable to create a new warehouse" });
     });
 }
 
+function getWarehouseInventory(req, res) {
+  const warehouseId = req.params.id;
+  knex
+    .select(
+      "inventories.id",
+      "inventories.warehouse_id",
+      "inventories.item_name",
+      "inventories.description",
+      "inventories.category",
+      "inventories.status",
+      "inventories.quantity"
+    )
+    .from("warehouses")
+    .join("inventories", "inventories.warehouse_id", "warehouses.id")
+    .where({ warehouse_id: warehouseId })
+    .then((warehouse) => {
+      if (warehouse.length === 0) {
+        return res
+          .status(404)
+          .json({ message: `Warehouse with ID: ${warehouseId} not  found` });
+      }
+      res.status(200).json(warehouse);
+    })
+    .catch((err) => {
+      // Console.log shows the error only on the server side
+      console.log(
+        `getWarehouseInventory: Unable to retrieve data with ID: ${req.params.id} ${err}`
+      );
+      res.status(500).json({
+        message: `Unable to retrieve data with ID: ${req.params.id}`,
+      });
+    });
+}
 // Edit Warehouse
 function editWarehouse(req, res) {
   const warehouseId = req.params.id;
@@ -92,37 +161,13 @@ function editWarehouse(req, res) {
     .then((updatedWarehouse) => {
       res.status(200).json(updatedWarehouse[0]);
     })
-    .catch(() => {
+    .catch((err) => {
+      // Console.log shows the error only on the server side
+      console.log(
+        `editWarehous: Unable to update warehouse with ID: ${warehouseId} ${err}`
+      );
       res.status(500).json({
         message: `Unable to update warehouse with ID: ${warehouseId}`,
-      });
-    });
-}
-
-function getWarehouseInventory(req, res) {
-  const warehouseId = req.params.id;
-
-  knex("warehouses")
-    .where({ id: warehouseId })
-    .then((warehouse) => {
-      if (warehouse.length === 0) {
-        return res
-          .status(404)
-          .json({ message: `Warehouse with ID: ${warehouseId} not found` });
-      }
-      knex("inventories")
-        .where({ warehouse_id: warehouseId })
-        .then((inventories) => {
-          res.status(200).json(inventories);
-        })
-        .catch((error) => {
-          console.log(error);
-          res.status(500).json({ message: "Internal server error." });
-        });
-    })
-    .catch(() => {
-      res.status(500).json({
-        message: `Unable to retrieve data with ID: ${req.params.id}`,
       });
     });
 }
@@ -152,7 +197,11 @@ function deleteWarehouse(req, res) {
           res.status(500).json({ message: "Internal server error." });
         });
     })
-    .catch(() => {
+    .catch((err) => {
+      // Console.log shows the error only on the server side
+      console.log(
+        `deleteWarehouse: Unable to delete warehouse with ID: ${warehouseId} ${err}`
+      );
       res.status(500).json({
         message: `Unable to delete warehouse with ID: ${warehouseId}`,
       });
@@ -165,4 +214,5 @@ module.exports = {
   deleteWarehouse,
   postWarehouse,
   editWarehouse,
+  getSingleWarehouse,
 };
