@@ -12,6 +12,7 @@ function getWarehouses(req, res) {
   });
 }
 
+// Post A New Warehouse
 function postWarehouse(req, res) {
   const requiredFields = [
     "warehouse_name",
