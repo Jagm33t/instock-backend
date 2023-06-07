@@ -1,10 +1,8 @@
-const knex = require('knex')(require('../knexfile'));
+const knex = require("knex")(require("../knexfile"));
 const express = require("express");
 require("dotenv").config(); // load variables from .env file
 const PORT = process.env.PORT || 8080; // Set server port from .env file
 const SERVER_URL = process.env.SERVER_URL;
-
-
 
 // GET functions
 function getWarehouses(req, res) {
@@ -56,17 +54,18 @@ function postWarehouse(req, res) {
     });
 }
 
-function getWarehouseInventory(req,res){
+function getWarehouseInventory(req, res) {
   const warehouseId = req.params.id;
- 
-  knex("warehouses")
-  .where({ id: warehouseId })
-  .then((warehouse) => {
-    if (warehouse.length === 0) {
-      return res.status(404).json({ message: `Warehouse with ID: ${warehouseId} not found` });
-    }
-knex("inventories")
 
+  knex("warehouses")
+    .where({ id: warehouseId })
+    .then((warehouse) => {
+      if (warehouse.length === 0) {
+        return res
+          .status(404)
+          .json({ message: `Warehouse with ID: ${warehouseId} not found` });
+      }
+      knex("inventories")
         .where({ warehouse_id: warehouseId })
         .then((inventories) => {
           res.status(200).json(inventories);
@@ -75,18 +74,18 @@ knex("inventories")
           console.log(error);
           res.status(500).json({ message: "Internal server error." });
         });
-})
-.catch(() => {
-  res.status(500).json({
-    message: `Unable to retrieve data with ID: ${req.params.id}`,
-  });
-});
+    })
+    .catch(() => {
+      res.status(500).json({
+        message: `Unable to retrieve data with ID: ${req.params.id}`,
+      });
+    });
 }
 
 function deleteWarehouse(req, res) {
   const warehouseId = req.params.id;
 
-  knex('warehouses')
+  knex("warehouses")
     .where({ id: warehouseId })
     .del()
     .then((result) => {
@@ -97,7 +96,7 @@ function deleteWarehouse(req, res) {
       }
 
       // Delete associated inventory items
-      knex('inventories')
+      knex("inventories")
         .where({ warehouse_id: warehouseId })
         .del()
         .then(() => {
@@ -105,7 +104,7 @@ function deleteWarehouse(req, res) {
         })
         .catch((error) => {
           console.log(error);
-          res.status(500).json({ message: 'Internal server error.' });
+          res.status(500).json({ message: "Internal server error." });
         });
     })
     .catch(() => {
