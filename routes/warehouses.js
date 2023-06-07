@@ -7,6 +7,7 @@ const {
   deleteWarehouse,
   postWarehouse,
   editWarehouse,
+  getSingleWarehouse,
 } = warehousesController;
 
 require("dotenv").config(); // load variables from .env file
@@ -18,7 +19,7 @@ const SERVER_URL = process.env.SERVER_URL;
  */
 router.get("/", getWarehouses);
 router.get("/:id/inventories", getWarehouseInventory);
-router.delete("/:id", deleteWarehouse);
+router.get("/:id", getSingleWarehouse).delete("/:id", deleteWarehouse);
 
 router.post("/", postWarehouse);
 
