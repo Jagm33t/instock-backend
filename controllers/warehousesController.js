@@ -69,6 +69,31 @@ function postWarehouse(req, res) {
     });
 }
 
+function getWarehouseInventory(req, res) {
+  const warehouseId = req.params.id;
+
+  knex.select("inventories.id",
+  "inventories.warehouse_id",
+  "inventories.item_name",
+  "inventories.description",
+  "inventories.category",
+  "inventories.status",
+  "inventories.quantity"
+  ).from('warehouses')
+  .join("inventories", "inventories.warehouse_id", "warehouses.id")
+  .where({warehouse_id:warehouseId})
+  .then((warehouse) =>{
+    if(warehouse.length === 0){
+      return res.status(404).json({ message: `Warehouse with ID: ${warehouseId} not  found` });
+    }
+    res.status(200).json(warehouse);
+  })
+  .catch(() => {
+res.status(500).json({
+message: `Unable to retrieve data with ID: ${req.params.id}`,
+});
+});
+}
 // Edit Warehouse
 function editWarehouse(req, res) {
   const warehouseId = req.params.id;
@@ -95,34 +120,6 @@ function editWarehouse(req, res) {
     .catch(() => {
       res.status(500).json({
         message: `Unable to update warehouse with ID: ${warehouseId}`,
-      });
-    });
-}
-
-function getWarehouseInventory(req, res) {
-  const warehouseId = req.params.id;
-
-  knex("warehouses")
-    .where({ id: warehouseId })
-    .then((warehouse) => {
-      if (warehouse.length === 0) {
-        return res
-          .status(404)
-          .json({ message: `Warehouse with ID: ${warehouseId} not found` });
-      }
-      knex("inventories")
-        .where({ warehouse_id: warehouseId })
-        .then((inventories) => {
-          res.status(200).json(inventories);
-        })
-        .catch((error) => {
-          console.log(error);
-          res.status(500).json({ message: "Internal server error." });
-        });
-    })
-    .catch(() => {
-      res.status(500).json({
-        message: `Unable to retrieve data with ID: ${req.params.id}`,
       });
     });
 }
