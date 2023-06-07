@@ -56,6 +56,7 @@ function postWarehouse(req, res) {
 
 // Edit Warehouse
 function editWarehouse(req, res) {}
+
 function getWarehouseInventory(req, res) {
   const warehouseId = req.params.id;
 
