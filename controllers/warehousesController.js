@@ -93,6 +93,7 @@ res.status(500).json({
 message: `Unable to retrieve data with ID: ${req.params.id}`,
 });
 });
+}
 // Edit Warehouse
 function editWarehouse(req, res) {
   const warehouseId = req.params.id;
