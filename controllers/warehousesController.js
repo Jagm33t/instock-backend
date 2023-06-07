@@ -55,7 +55,11 @@ function postWarehouse(req, res) {
     });
 }
 
+// Edit Warehouse
+function editWarehouse(req, res) {}
+
 module.exports = {
   getWarehouses,
   postWarehouse,
+  editWarehouse,
 };
