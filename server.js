@@ -23,6 +23,7 @@ app.use("/", homeRoutes);
 app.use("/api/warehouses", warehousesRoutes);
 app.use("/api/inventories", inventoriesRoutes);
 
+
 /*
  * Start the server on an BIND_ADDRESS and PORT number (socket)
  */
