@@ -69,6 +69,36 @@ function postWarehouse(req, res) {
     });
 }
 
+// Edit Warehouse
+function editWarehouse(req, res) {
+  const warehouseId = req.params.id;
+  const updatedData = { ...req.body };
+  delete updatedData.id;
+
+  knex("warehouses")
+    .where({ id: warehouseId })
+    .update(updatedData)
+    .then((warehouse) => {
+      if (warehouse === 0) {
+        return res
+          .status(404)
+          .json({ message: `Warehouse with ID ${warehouseId} not found` });
+      }
+
+      return knex("warehouses").where({
+        id: warehouseId,
+      });
+    })
+    .then((updatedWarehouse) => {
+      res.status(200).json(updatedWarehouse[0]);
+    })
+    .catch(() => {
+      res.status(500).json({
+        message: `Unable to update warehouse with ID: ${warehouseId}`,
+      });
+    });
+}
+
 function getWarehouseInventory(req, res) {
   const warehouseId = req.params.id;
 
@@ -134,4 +164,5 @@ module.exports = {
   getWarehouseInventory,
   deleteWarehouse,
   postWarehouse,
+  editWarehouse,
 };
