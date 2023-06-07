@@ -145,37 +145,44 @@ function editInventoryItem(req, res) {
   const updatedData = { ...req.body };
   delete updatedData.id;
 
-  knex("warehouses")
-    .where({ id: warehouseId })
-    .first()
-    .then((warehouse) => {
-      if (!warehouse) {
-        return res.status(404).json({
-          message: `Warehouse with ID: ${warehouseId} not found.`,
-        });
-      }
+  knex("inventories")
+    .join("warehouses", "warehouses.id", "inventories.warehouse_id")
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => res.status(400).send(`Error retrieving data: ${err}`));
 
-      return knex("inventories").where({ id: inventoryId }).update(updatedData);
-    })
-    .then((result) => {
-      if (result === 0) {
-        return res.status(404).json({
-          message: `Inventory with ID: ${inventoryId} not found.`,
-        });
-      }
+  // knex("warehouses")
+  //   .where({ id: warehouseId })
+  //   .first()
+  //   .then((warehouse) => {
+  //     if (!warehouse) {
+  //       return res.status(404).json({
+  //         message: `Warehouse with ID: ${warehouseId} not found.`,
+  //       });
+  //     }
 
-      return knex("inventories").where({ id: inventoryId }).first();
-    })
-    .then((updatedItem) => {
-      res.status(200).json(updatedItem);
-      return null;
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({
-        message: `Unable to update inventory with ID: ${inventoryId}`,
-      });
-    });
+  //     return knex("inventories").where({ id: inventoryId }).update(updatedData);
+  //   })
+  //   .then((result) => {
+  //     if (result === 0) {
+  //       return res.status(404).json({
+  //         message: `Inventory with ID: ${inventoryId} not found.`,
+  //       });
+  //     }
+
+  //     return knex("inventories").where({ id: inventoryId }).first();
+  //   })
+  //   .then((updatedItem) => {
+  //     res.status(200).json(updatedItem);
+  //     return null;
+  //   })
+  //   .catch((error) => {
+  //     console.error(error);
+  //     res.status(500).json({
+  //       message: `Unable to update inventory with ID: ${inventoryId}`,
+  //     });
+  //   });
 }
 
 module.exports = {
