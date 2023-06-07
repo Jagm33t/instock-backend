@@ -9,6 +9,25 @@ function postInventoryItem(req, res) {
   res.status(200).send("POST new inventory Item");
 }
 
+// Delete an Inventory Item
+function deleteInventoryItem(req, res) {
+  knex("inventories")
+    .where({ id: req.params.id })
+    .del()
+    .then((result) => {
+      if (result === 0) {
+        return res.status(404).json({
+          message: `Inventory with ID: ${req.params.id} to be deleted not found.`,
+        });
+      }
+      res.status(204).send();
+    })
+    .catch(() => {
+      res.status(500).json({ message: "Unable to delete inventory" });
+    });
+}
+
 module.exports = {
   postInventoryItem,
+  deleteInventoryItem,
 };
