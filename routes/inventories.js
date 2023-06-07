@@ -13,13 +13,6 @@ const SERVER_URL = process.env.SERVER_URL;
 router.get("/", getInventoryItems);
 
 /*
- * GET Inventory Item - Join wareshouse data name
- */
-router.route("/:id/warehouse_name").get((req, res) => {
-  knex("warehouse_name").join("warehouse_name");
-});
-
-/*
  * POST Inventory Item
  */
 router.post("/", postInventoryItem);
