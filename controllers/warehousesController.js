@@ -3,23 +3,59 @@ const knex = require("knex")(require("../knexfile"));
 // GET functions
 // Get all warehouses
 function getWarehouses(req, res) {
-  knex("warehouses")
-    .select(
-      "id",
-      "warehouse_name",
-      "address",
-      "city",
-      "country",
-      "contact_name",
-      "contact_position",
-      "contact_phone",
-      "contact_email"
-    )
+  const searchTerm = req.query.s;
+
+  let query = knex("warehouses").select(
+    "id",
+    "warehouse_name",
+    "address",
+    "city",
+    "country",
+    "contact_name",
+    "contact_position",
+    "contact_phone",
+    "contact_email"
+  );
+
+  if (searchTerm) {
+    const lowercaseSearchTerm = searchTerm.toLowerCase();
+    query = query.where((builder) =>
+      builder
+        .whereRaw("LOWER(warehouse_name) LIKE ?", `%${lowercaseSearchTerm}%`)
+        .orWhereRaw("LOWER(address) LIKE ?", `%${lowercaseSearchTerm}%`)
+        .orWhereRaw("LOWER(city) LIKE ?", `%${lowercaseSearchTerm}%`)
+        .orWhereRaw("LOWER(country) LIKE ?", `%${lowercaseSearchTerm}%`)
+        .orWhereRaw("LOWER(contact_name) LIKE ?", `%${lowercaseSearchTerm}%`)
+        .orWhereRaw(
+          "LOWER(contact_position) LIKE ?",
+          `%${lowercaseSearchTerm}%`
+        )
+        .orWhereRaw("LOWER(contact_phone) LIKE ?", `%${lowercaseSearchTerm}%`)
+        .orWhereRaw("LOWER(contact_email) LIKE ?", `%${lowercaseSearchTerm}%`)
+    );
+  }
+
+  // query
+  //   .then((data) => {
+  //     console.log(data);
+  //     res.status(200).json(data);
+  //   })
+  //   .catch((err) => {
+  //     // Console.log shows the error only on the server side
+  //     // console.log(`getWarehouses: Error retrieving Warehouses ${err}`);
+  //     res.status(400).send(`Error retrieving Warehouses.`);
+  //   });
+  query
     .then((data) => {
-      res.status(200).json(data);
+      if (data.length === 0 && searchTerm) {
+        res
+          .status(404)
+          .send(`No match with your search keyword '${searchTerm}'`);
+      } else {
+        res.status(200).json(data);
+      }
     })
     .catch((err) => {
-      // Console.log shows the error only on the server side
       console.log(`getWarehouses: Error retrieving Warehouses ${err}`);
       res.status(400).send(`Error retrieving Warehouses.`);
     });
@@ -93,10 +129,13 @@ function postWarehouse(req, res) {
   knex("warehouses")
     .insert(req.body)
     .then((result) => {
-      return knex("warehouses").where({ id: result[0] });
+      return knex("warehouses").where({ id: result[0] }).first();
     })
     .then((createdWarehouse) => {
-      res.status(201).json(createdWarehouse);
+      const updatedData = { ...createdWarehouse };
+      delete updatedData.created_at;
+      delete updatedData.updated_at;
+      res.status(201).json(updatedData);
     })
     .catch((err) => {
       // Console.log shows the error only on the server side
