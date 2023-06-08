@@ -19,6 +19,8 @@ const SERVER_URL = process.env.SERVER_URL;
 router.get("/", getInventoryItems);
 router.get("/:id", getSingleInventory);
 
+// to search inventory: http://localhost:8080/api/inventories?s={xxx}
+
 /*
  * POST Inventory Item
  */
