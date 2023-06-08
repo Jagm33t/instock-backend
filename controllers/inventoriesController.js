@@ -286,6 +286,9 @@ function editInventoryItem(req, res) {
           message: `Unable to update inventory with ID: ${inventoryId}`,
         });
       }
+    });
+}
+
 // Get a single inventory by id
 function getSingleInventory(req, res) {
   const inventoryId = req.params.id;
@@ -325,4 +328,4 @@ module.exports = {
   deleteInventoryItem,
   editInventoryItem,
   getSingleInventory,
-}
+};
