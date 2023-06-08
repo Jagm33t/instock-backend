@@ -15,7 +15,9 @@ function getInventoryItems(req, res) {
 }
 
 function getInventoryItems(req, res) {
-  knex("inventories")
+  const searchTerm = req.query.s;
+
+  let query = knex("inventories")
     .join("warehouses", "warehouses.id", "inventories.warehouse_id")
     .select(
       "inventories.id",
@@ -25,8 +27,20 @@ function getInventoryItems(req, res) {
       "inventories.category",
       "inventories.status",
       "inventories.quantity"
-    )
+    );
 
+  if (searchTerm) {
+    const lowercaseSearchTerm = searchTerm.toLowerCase();
+    query = query.where((builder) =>
+      builder
+        .whereRaw("LOWER(warehouse_name) LIKE ?", `%${lowercaseSearchTerm}%`)
+        .orWhereRaw("LOWER(item_name) LIKE ?", `%${lowercaseSearchTerm}%`)
+        .orWhereRaw("LOWER(description) LIKE ?", `%${lowercaseSearchTerm}%`)
+        .orWhereRaw("LOWER(category) LIKE ?", `%${lowercaseSearchTerm}%`)
+    );
+  }
+
+  query
     .then((data) => {
       // const copyData = [...data];
       // const notShowField = ["address", "city", ""];
@@ -35,8 +49,13 @@ function getInventoryItems(req, res) {
       //     delete element[field];
       //   }
       // });
-
-      res.status(200).json(data);
+      if (data.length === 0 && searchTerm) {
+        res
+          .status(404)
+          .send(`No match with your search keyword '${searchTerm}'`);
+      } else {
+        res.status(200).json(data);
+      }
     })
     .catch((err) => res.status(400).send(`Error retrieving data: ${err}`));
 }
@@ -292,9 +311,12 @@ function editInventoryItem(req, res) {
 // Get a single inventory by id
 function getSingleInventory(req, res) {
   const inventoryId = req.params.id;
+
   knex("inventories")
+    .join("warehouses", "warehouses.id", "inventories.warehouse_id")
     .select(
       "inventories.id",
+      "warehouses.warehouse_name",
       "inventories.warehouse_id",
       "inventories.item_name",
       "inventories.description",
@@ -302,7 +324,7 @@ function getSingleInventory(req, res) {
       "inventories.status",
       "inventories.quantity"
     )
-    .where({ id: inventoryId })
+    .where({ "inventories.id": inventoryId })
     .then((result) => {
       if (result.length === 0) {
         return res
