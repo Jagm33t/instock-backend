@@ -317,9 +317,12 @@ function editInventoryItem(req, res) {
 // Get a single inventory by id
 function getSingleInventory(req, res) {
   const inventoryId = req.params.id;
+
   knex("inventories")
+    .join("warehouses", "warehouses.id", "inventories.warehouse_id")
     .select(
       "inventories.id",
+      "warehouses.warehouse_name",
       "inventories.warehouse_id",
       "inventories.item_name",
       "inventories.description",
@@ -327,7 +330,7 @@ function getSingleInventory(req, res) {
       "inventories.status",
       "inventories.quantity"
     )
-    .where({ id: inventoryId })
+    .where({ "inventories.id": inventoryId })
     .then((result) => {
       if (result.length === 0) {
         return res
