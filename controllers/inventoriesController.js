@@ -16,6 +16,8 @@ function getInventoryItems(req, res) {
 
 function getInventoryItems(req, res) {
   const searchTerm = req.query.s;
+  const sortBy = req.query.sort_by;
+  const orderBy = req.query.order_by || "asc";
 
   let query = knex("inventories")
     .join("warehouses", "warehouses.id", "inventories.warehouse_id")
@@ -38,6 +40,10 @@ function getInventoryItems(req, res) {
         .orWhereRaw("LOWER(description) LIKE ?", `%${lowercaseSearchTerm}%`)
         .orWhereRaw("LOWER(category) LIKE ?", `%${lowercaseSearchTerm}%`)
     );
+  }
+
+  if (sortBy) {
+    query = query.orderBy(sortBy, orderBy);
   }
 
   query
