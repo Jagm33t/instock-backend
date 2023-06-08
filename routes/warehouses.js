@@ -17,4 +17,6 @@ router.delete("/:id", deleteWarehouse);
 
 router.post("/", postWarehouse);
 
+// to search warehouse: http://localhost:8080/api/warehouses?s={xxx}
+
 module.exports = router;
