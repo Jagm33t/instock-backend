@@ -7,14 +7,6 @@ const router = express.Router();
 
 // GET functions
 function getInventoryItems(req, res) {
-  knex("inventories")
-    .then((data) => {
-      res.status(200).json(data);
-    })
-    .catch((err) => res.status(400).send(`Error retrieving data: ${err}`));
-}
-
-function getInventoryItems(req, res) {
   const searchTerm = req.query.s;
   const sortBy = req.query.sort_by;
   const orderBy = req.query.order_by || "asc";
