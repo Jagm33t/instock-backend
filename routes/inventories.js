@@ -3,8 +3,9 @@ const inventoriesController = require("../controllers/inventoriesController");
 
 const {
   postInventoryItem,
-  getInventoryItems,
   deleteInventoryItem,
+  editInventoryItem,
+  getInventoryItems,
   getSingleInventory,
 } = inventoriesController;
 
@@ -23,5 +24,6 @@ router.get("/:id", getSingleInventory);
  */
 router.post("/", postInventoryItem);
 router.delete("/:id", deleteInventoryItem);
+router.put("/:id", editInventoryItem);
 
 module.exports = router;
