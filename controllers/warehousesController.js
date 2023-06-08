@@ -93,10 +93,13 @@ function postWarehouse(req, res) {
   knex("warehouses")
     .insert(req.body)
     .then((result) => {
-      return knex("warehouses").where({ id: result[0] });
+      return knex("warehouses").where({ id: result[0] }).first();
     })
     .then((createdWarehouse) => {
-      res.status(201).json(createdWarehouse);
+      const updatedData = { ...createdWarehouse };
+      delete updatedData.created_at;
+      delete updatedData.updated_at;
+      res.status(201).json(updatedData);
     })
     .catch((err) => {
       // Console.log shows the error only on the server side
