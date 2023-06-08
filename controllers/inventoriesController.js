@@ -309,6 +309,7 @@ function getSingleInventory(req, res) {
           .status(404)
           .send({ message: `Inventory ID ${inventoryId} not found.` });
       }
+ 
       return res.status(200).json(result);
     })
     .catch((err) => {
