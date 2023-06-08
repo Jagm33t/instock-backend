@@ -14,32 +14,67 @@ function getInventoryItems(req, res) {
     .catch((err) => res.status(400).send(`Error retrieving data: ${err}`));
 }
 
-function getInventoryItems(req, res) {
-  knex("inventories")
-    .join("warehouses", "warehouses.id", "inventories.warehouse_id")
+// function getInventoryItems(req, res) {
+//   knex("inventories")
+//     .join("warehouses", "warehouses.id", "inventories.warehouse_id")
+//     .select(
+//       "inventories.id",
+//       "warehouses.warehouse_name",
+//       "inventories.item_name",
+//       "inventories.description",
+//       "inventories.category",
+//       "inventories.status",
+//       "inventories.quantity"
+//     )
+
+//     .then((data) => {
+//       // const copyData = [...data];
+//       // const notShowField = ["address", "city", ""];
+//       // copyData.forEach((element) => {
+//       //   for (const field of notShowField) {
+//       //     delete element[field];
+//       //   }
+//       // });
+
+//       res.status(200).json(data);
+//     })
+//     .catch((err) => res.status(400).send(`Error retrieving data: ${err}`));
+// }
+
+
+function getInventoryItem(req, res) {
+  const inventoryId = req.params.id;
+    knex("inventories")
     .select(
-      "inventories.id",
-      "warehouses.warehouse_name",
-      "inventories.item_name",
-      "inventories.description",
-      "inventories.category",
-      "inventories.status",
-      "inventories.quantity"
+      "id",
+      "item_name",
+      "description",
+      "category",
+      "status",
+      "quantity",
+      "warehouse_name",
+
     )
+    .where({id:inventoryId})
+    .then((result)=> {
+      if(result.length === 0){
+        return res
+        .status(404)
+        .send ({message:`inventory Id ${inventoryId} not found`});
 
-    .then((data) => {
-      // const copyData = [...data];
-      // const notShowField = ["address", "city", ""];
-      // copyData.forEach((element) => {
-      //   for (const field of notShowField) {
-      //     delete element[field];
-      //   }
-      // });
-
-      res.status(200).json(data);
+      }
+      return res.status(200).json(result);
+     
     })
-    .catch((err) => res.status(400).send(`Error retrieving data: ${err}`));
-}
+    .catch((err) =>{
+      console.log(`getsingleinventory: error retrieving data from the inventory Id ${inventoryId} ${err}`
+      );
+      return res.status(400)
+      .send (`Error retrieving data from the inventory Id ${inventoryId}`);
+
+    })
+
+  }
 
 // POST functions
 // Add a new inventory Item
@@ -120,5 +155,6 @@ function deleteInventoryItem(req, res) {
 module.exports = {
   postInventoryItem,
   getInventoryItems,
+  getInventoryItem,
   deleteInventoryItem,
 };
