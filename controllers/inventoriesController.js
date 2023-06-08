@@ -286,6 +286,36 @@ function editInventoryItem(req, res) {
           message: `Unable to update inventory with ID: ${inventoryId}`,
         });
       }
+// Get a single inventory by id
+function getSingleInventory(req, res) {
+  const inventoryId = req.params.id;
+  knex("inventories")
+    .select(
+      "inventories.id",
+      "inventories.warehouse_id",
+      "inventories.item_name",
+      "inventories.description",
+      "inventories.category",
+      "inventories.status",
+      "inventories.quantity"
+    )
+    .where({ id: inventoryId })
+    .then((result) => {
+      if (result.length === 0) {
+        return res
+          .status(404)
+          .send({ message: `Inventory ID ${inventoryId} not found.` });
+      }
+      return res.status(200).json(result);
+    })
+    .catch((err) => {
+      // Console.log shows the error only on the server side
+      console.log(
+        `getSingleInventory: Error retrieving data for the Inventory ID ${inventoryId} ${err}`
+      );
+      return res
+        .status(400)
+        .send(`Error retrieving data for the Inventory ID ${inventoryId}`);
     });
 }
 
@@ -294,4 +324,5 @@ module.exports = {
   getInventoryItems,
   deleteInventoryItem,
   editInventoryItem,
-};
+  getSingleInventory,
+}

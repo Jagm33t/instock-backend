@@ -6,6 +6,7 @@ const {
   deleteInventoryItem,
   editInventoryItem,
   getInventoryItems,
+  getSingleInventory,
 } = inventoriesController;
 
 require("dotenv").config(); // load variables from .env file
@@ -16,6 +17,7 @@ const SERVER_URL = process.env.SERVER_URL;
  * GET Inventory Item
  */
 router.get("/", getInventoryItems);
+router.get("/:id", getSingleInventory);
 
 /*
  * POST Inventory Item
