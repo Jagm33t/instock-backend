@@ -174,11 +174,39 @@ function getWarehouseInventory(req, res) {
     });
 }
 
-// Edit Warehouse
+// PUT Edit Warehouse
 function editWarehouse(req, res) {
   const warehouseId = req.params.id;
   const updatedData = { ...req.body };
   delete updatedData.id;
+
+  const requiredFields = [
+    "warehouse_name",
+    "address",
+    "city",
+    "country",
+    "contact_name",
+    "contact_position",
+    "contact_phone",
+    "contact_email",
+  ];
+
+  const phoneValidate = /^\+\d{1,3} \(\d{3}\) \d{3}-\d{4}$/;
+  const emailValidate = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  for (const field of requiredFields) {
+    if (!updatedData[field]) {
+      return res.status(400).send(`Please provide ${field} for the warehouse`);
+    }
+  }
+
+  if (!phoneValidate.test(updatedData.contact_phone)) {
+    return res.status(400).send("Please provide a valid phone number");
+  }
+
+  if (!emailValidate.test(updatedData.contact_email)) {
+    return res.status(400).send("Please provide a valid email address");
+  }
 
   knex("warehouses")
     .where({ id: warehouseId })
@@ -190,9 +218,21 @@ function editWarehouse(req, res) {
           .json({ message: `Warehouse with ID ${warehouseId} not found` });
       }
 
-      return knex("warehouses").where({
-        id: warehouseId,
-      });
+      return knex("warehouses")
+        .select(
+          "id",
+          "warehouse_name",
+          "address",
+          "city",
+          "country",
+          "contact_name",
+          "contact_position",
+          "contact_phone",
+          "contact_email"
+        )
+        .where({
+          id: warehouseId,
+        });
     })
     .then((updatedWarehouse) => {
       res.status(200).json(updatedWarehouse[0]);
