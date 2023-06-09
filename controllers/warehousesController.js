@@ -79,7 +79,7 @@ function getSingleWarehouse(req, res) {
           .status(404)
           .send({ message: `Warehouse ID ${warehouseId} not found.` });
       }
-      return res.status(200).json(result);
+      return res.status(200).json(result[0]);
     })
     .catch((err) => {
       // Console.log shows the error only on the server side

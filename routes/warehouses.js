@@ -7,13 +7,14 @@ const {
   deleteWarehouse,
   postWarehouse,
   editWarehouse,
+  getSingleWarehouse,
 } = warehousesController;
 
 /*
  * GET home page
  */
 router.get("/", getWarehouses);
-router.get("/:id", getWarehouses);
+router.get("/:id", getSingleWarehouse);
 router.get("/:id/inventories", getWarehouseInventory);
 router.delete("/:id", deleteWarehouse);
 router.put("/:id", editWarehouse);
