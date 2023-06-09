@@ -48,23 +48,27 @@ function getInventoryItems(req, res) {
 // Add a new inventory Item
 function postInventoryItem(req, res) {
   // Check if the body has all required fields
-  if (
-    !req.body.warehouse_id ||
-    !req.body.item_name ||
-    !req.body.description ||
-    !req.body.category ||
-    !req.body.status ||
-    !typeof req.body.quantity
-  ) {
-    return res
-      .status(400)
-      .send(
-        "Please provide the following properties for the item in the request: warehouse_id, item_name, description, category, status, quantity"
-      );
+  const requiredFields = [
+    "warehouse_id",
+    "item_name",
+    "description",
+    "category",
+    "status",
+    "quantity",
+  ];
+
+  for (const field of requiredFields) {
+    if (!req.body[field]) {
+      return res.status(400).send(`Please provide ${field} for the inventory`);
+    }
   }
-  if (typeof req.body.quantity !== "number") {
-    return res.status(400).send("The quantity property should be a number.");
+
+  const quantity = req.body.quantity;
+
+  if (isNaN(quantity)) {
+    return res.status(400).json({ message: "Quantity must be a number" });
   }
+
   // Check if the warehouse_id exists
   knex("warehouses")
     .select("id")
@@ -75,30 +79,33 @@ function postInventoryItem(req, res) {
           message: `Wharehouse with ID: ${req.body.warehouse_id} not found`,
         });
       }
+      // Add the new inventory item
+      knex("inventories")
+        .insert(req.body)
+        .then((result) => {
+          return knex("inventories")
+            .select(
+              "id",
+              "warehouse_id",
+              "item_name",
+              "description",
+              "category",
+              "status",
+              "quantity"
+            )
+            .where({ id: result[0] });
+        })
+        .then((createdItem) => {
+          return res.status(201).json(createdItem);
+        })
+        .catch(() => {
+          return res
+            .status(500)
+            .json({ message: "Unable to create new Inventory Item" });
+        });
     })
-    .catch((err) => res.status(400).send(`Error retrieving Warehouse: ${err}`));
-
-  // Add the new inventory item
-  knex("inventories")
-    .insert(req.body)
-    .then((result) => {
-      return knex("inventories")
-        .select(
-          "id",
-          "warehouse_id",
-          "item_name",
-          "description",
-          "category",
-          "status",
-          "quantity"
-        )
-        .where({ id: result[0] });
-    })
-    .then((createdItem) => {
-      res.status(201).json(createdItem);
-    })
-    .catch(() => {
-      res.status(500).json({ message: "Unable to create new Inventory Item" });
+    .catch((err) => {
+      return res.status(400).send(`Error retrieving Warehouse: ${err}`);
     });
 }
 
