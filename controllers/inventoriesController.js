@@ -348,7 +348,6 @@ function getSingleInventory(req, res) {
 module.exports = {
   postInventoryItem,
   getInventoryItems,
-  getInventoryItem,
   deleteInventoryItem,
   editInventoryItem,
   getSingleInventory,
