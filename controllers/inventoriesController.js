@@ -55,8 +55,8 @@ function getInventoryItems(req, res) {
         res.status(200).json(data);
       }
     })
-    .catch((err) => res.status(400).send(`Error retrieving data: ${err}`));
-}
+
+  }
 
 // POST functions
 // Add a new inventory Item
@@ -329,6 +329,7 @@ function getSingleInventory(req, res) {
           .status(404)
           .send({ message: `Inventory ID ${inventoryId} not found.` });
       }
+ 
       return res.status(200).json(result);
     })
     .catch((err) => {
