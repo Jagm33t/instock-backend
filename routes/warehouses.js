@@ -19,5 +19,6 @@ router.put("/:id", editWarehouse);
 router.post("/", postWarehouse);
 
 // to search warehouse: http://localhost:8080/api/warehouses?s={xxx}
+// to sort warehouse: http://localhost:8080/api/warehouses?sort_by={xxx}&order_by={xxx}
 
 module.exports = router;

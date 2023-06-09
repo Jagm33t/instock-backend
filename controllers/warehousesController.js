@@ -4,6 +4,10 @@ const knex = require("knex")(require("../knexfile"));
 // Get all warehouses
 function getWarehouses(req, res) {
   const searchTerm = req.query.s;
+  const sortBy = req.query.sort_by;
+  const orderBy = req.query.order_by || "asc";
+  // console.log("sortBy: ", sortBy);
+  // console.log("orderBy: ", orderBy);
 
   let query = knex("warehouses").select(
     "id",
@@ -33,6 +37,10 @@ function getWarehouses(req, res) {
         .orWhereRaw("LOWER(contact_phone) LIKE ?", `%${lowercaseSearchTerm}%`)
         .orWhereRaw("LOWER(contact_email) LIKE ?", `%${lowercaseSearchTerm}%`)
     );
+  }
+
+  if (sortBy) {
+    query = query.orderBy(sortBy, orderBy);
   }
 
   // query
