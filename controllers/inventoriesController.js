@@ -201,7 +201,6 @@ function getSingleInventory(req, res) {
     .select(
       "inventories.id",
       "warehouses.warehouse_name",
-      "inventories.warehouse_id",
       "inventories.item_name",
       "inventories.description",
       "inventories.category",
@@ -216,7 +215,7 @@ function getSingleInventory(req, res) {
           .send({ message: `Inventory ID ${inventoryId} not found.` });
       }
 
-      return res.status(200).json(result);
+      return res.status(200).json(result[0]);
     })
     .catch((err) => {
       // Console.log shows the error only on the server side
