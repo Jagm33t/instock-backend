@@ -6,8 +6,6 @@ function getWarehouses(req, res) {
   const searchTerm = req.query.s;
   const sortBy = req.query.sort_by;
   const orderBy = req.query.order_by || "asc";
-  // console.log("sortBy: ", sortBy);
-  // console.log("orderBy: ", orderBy);
 
   let query = knex("warehouses").select(
     "id",
@@ -43,16 +41,6 @@ function getWarehouses(req, res) {
     query = query.orderBy(sortBy, orderBy);
   }
 
-  // query
-  //   .then((data) => {
-  //     console.log(data);
-  //     res.status(200).json(data);
-  //   })
-  //   .catch((err) => {
-  //     // Console.log shows the error only on the server side
-  //     // console.log(`getWarehouses: Error retrieving Warehouses ${err}`);
-  //     res.status(400).send(`Error retrieving Warehouses.`);
-  //   });
   query
     .then((data) => {
       if (data.length === 0 && searchTerm) {
