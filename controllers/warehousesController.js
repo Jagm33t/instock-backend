@@ -110,16 +110,22 @@ function postWarehouse(req, res) {
 
   for (const field of requiredFields) {
     if (!req.body[field]) {
-      return res.status(400).send(`Please provide ${field} for the warehouse`);
+      return res
+        .status(400)
+        .json({ message: `Please provide ${field} for the inventory` });
     }
   }
 
   if (!phoneValidate.test(req.body.contact_phone)) {
-    return res.status(400).send("Please provide a valid phone number");
+    return res
+      .status(400)
+      .json({ message: "Please provide a valid phone number" });
   }
 
   if (!emailValidate.test(req.body.contact_email)) {
-    return res.status(400).send("Please provide a valid email address");
+    return res
+      .status(400)
+      .json({ message: "Please provide a valid email address" });
   }
 
   knex("warehouses")
@@ -196,16 +202,22 @@ function editWarehouse(req, res) {
 
   for (const field of requiredFields) {
     if (!updatedData[field]) {
-      return res.status(400).send(`Please provide ${field} for the warehouse`);
+      return res
+        .status(400)
+        .json({ message: `Please provide ${field} for the inventory` });
     }
   }
 
   if (!phoneValidate.test(updatedData.contact_phone)) {
-    return res.status(400).send("Please provide a valid phone number");
+    return res
+      .status(400)
+      .json({ message: "Please provide a valid phone number" });
   }
 
   if (!emailValidate.test(updatedData.contact_email)) {
-    return res.status(400).send("Please provide a valid email address");
+    return res
+      .status(400)
+      .json({ message: "Please provide a valid email address" });
   }
 
   knex("warehouses")
