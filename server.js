@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 8080; // Set server port from .env file
 const BIND_ADDRESS = process.env.BIND_ADDRESS || "127.0.0.1"; // Set server address from .env file
 
 /*
- * Middleware
+ * Middlewares
  * CORS: allows sharing data with apps on others servers, cross origin
  * express.json(): allows access to incoming data posted to the server as part of the bady (req.body)
  */
